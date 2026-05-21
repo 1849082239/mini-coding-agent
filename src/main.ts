@@ -13,12 +13,12 @@ const model = new Model({
 
 const userMessage: Message = {
   role: "user",
-  content: "这个项目的入口文件在哪？",
+  content: "帮我找出这个项目中所有工具的参数定义，对比它们是否一致，然后给出一份工具清单和改进建议",
 };
 
 const state: AgentState = {
   messages: [userMessage],
-  task: "这个项目的入口文件在哪？",
+  task: "项目架构",
   workingDir: process.cwd(),
 };
 

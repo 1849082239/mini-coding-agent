@@ -31,3 +31,13 @@ export interface ModelResponse {
   content: string;
   toolCalls?: ToolCall[];
 }
+
+/** 步骤状态 */
+export type TodoStatus = "pending" | "running" | "completed" | "failed";
+
+/** 执行计划中的单个步骤 */
+export interface TodoItem {
+  id: string;
+  description: string;
+  status: TodoStatus;
+}
