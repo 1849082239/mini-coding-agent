@@ -67,7 +67,7 @@ export async function runAgent(
 
       console.log(`[Agent] 调用工具: ${toolCall.name}, 参数:`, JSON.stringify(toolCall.arguments));
       const result = await tool.execute(toolCall.arguments, state);
-      console.log(`[Agent] 工具 ${toolCall.name} 返回结果长度: ${result.length}`);
+      console.log(`[Agent] 工具 ${toolCall.name} 返回结果:\n${result}`);
       allMessages.push({
         role: "tool_result",
         toolCallId: toolCall.id,
