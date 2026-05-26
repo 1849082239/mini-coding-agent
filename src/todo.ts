@@ -5,7 +5,7 @@ export class TodoManager {
     /** 批量创建步骤，全部初始化为 pending */
     createItems(descriptions: string[]): TodoItem[] {
         const newItems = descriptions.map((desc) => ({
-            id: String(this.nextId++),
+            id: `${this.nextId++}`,
             description: desc,
             status: "pending" as const,
         }));
@@ -21,6 +21,11 @@ export class TodoManager {
     }
     getAll(): readonly TodoItem[] {
         return [...this.items];
+    }
+    /** 清空所有步骤，重置计数器 */
+    clear(): void {
+        this.items = [];
+        this.nextId = 1;
     }
     /** 判断是否所有步骤都已完成 */
     allCompleted(): boolean {
@@ -39,7 +44,7 @@ export class TodoManager {
             failed: "[!]",
         };
         const lines = this.items.map(
-            (t) => `  ${labels[t.status]} #${t.id} ${t.description}`,
+            (t) => `${labels[t.status]} ${t.id} ${t.description}`,
         );
         return `执行计划:\n${lines.join("\n")}`;
     }

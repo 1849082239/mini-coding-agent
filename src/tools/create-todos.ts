@@ -23,6 +23,13 @@ export function createTodosTool(todoManager: TodoManager): Tool {
             if (!Array.isArray(descriptions) || descriptions.length === 0) {
                 return "错误：必须提供至少一个步骤描述。";
             }
+            if (todoManager.getAll().length > 0) {
+                const hasStarted = todoManager.getAll().some((t) => t.status !== "pending");
+                if (hasStarted) {
+                    return `提示：执行计划已存在且已开始执行，不需要重复创建。请直接使用 \`update_todo\` 工具更新并推进现有步骤的状态。\n\n当前${todoManager.formatForPrompt()}`;
+                }
+                todoManager.clear();
+            }
             const items = todoManager.createItems(descriptions);
             return `已创建 ${items.length} 个步骤:\n${todoManager.formatForPrompt()}`;
         },

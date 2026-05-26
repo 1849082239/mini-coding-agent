@@ -33,7 +33,9 @@ export const readFileTool: Tool = {
     const endLine = Number(args.endLine) || startLine + maxLines - 1;
 
     // 安全检查：确保不会读取工作目录之外的文件
-    if (!filePath.startsWith(state.workingDir)) {
+    const normalizedPath = filePath.replace(/\\/g, "/");
+    const normalizedWorkingDir = state.workingDir.replace(/\\/g, "/");
+    if (!normalizedPath.toLowerCase().startsWith(normalizedWorkingDir.toLowerCase())) {
       return `错误：不能读取工作目录之外的文件。`;
     }
 

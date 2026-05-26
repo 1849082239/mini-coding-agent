@@ -9,6 +9,8 @@ import { writeFileTool } from "./write-file";
 import { placeholderTools } from "./placeholder";
 import { runCommandTool } from "./run-command";
 import { TodoManager } from "../todo";
+import { gitStatusTool } from "./git-status";
+import { gitDiffTool } from "./git-diff";
 
 const todoManager = new TodoManager();
 
@@ -21,6 +23,8 @@ export const tools: Tool[] = [
   patchFileTool,
   writeFileTool,
   runCommandTool,
+  gitStatusTool,
+  gitDiffTool,
 ];
 
 export {
@@ -33,4 +37,6 @@ export {
   writeFileTool,
   placeholderTools,
   runCommandTool,
+  gitStatusTool,
+  gitDiffTool,
 };

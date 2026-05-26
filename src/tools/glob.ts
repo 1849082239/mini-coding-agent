@@ -53,10 +53,12 @@ export const globTool: Tool = {
       const allFiles = await readdir(state.workingDir, {
         recursive: true,
       }).then((entries) =>
-        (entries as string[]).filter(
-          (entry) =>
-            !entry.split("/").some((segment) => ignore.has(segment)),
-        ),
+        (entries as string[])
+          .map((entry) => entry.replace(/\\/g, "/"))
+          .filter(
+            (entry) =>
+              !entry.split("/").some((segment) => ignore.has(segment)),
+          ),
       );
 
       /** 将 glob 模式转为正则：* → [^/]*, ** → .*, ? → [^/] */

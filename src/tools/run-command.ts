@@ -55,18 +55,36 @@ export const runCommandTool: Tool = {
     }
 
     try {
-      const { stdout, stderr } = await execAsync(command, {
+      const { stdout, stderr } = (await execAsync(command, {
         cwd: state.workingDir,
         timeout,
         maxBuffer: 1024 * 1024,
-      });
+        encoding: "buffer",
+      })) as { stdout: Buffer; stderr: Buffer };
 
-      return formatCommandResult(stdout, stderr);
+      return formatCommandResult(decodeBuffer(stdout), decodeBuffer(stderr));
     } catch (error: unknown) {
       return formatCommandError(error);
     }
   },
 };
+
+function decodeBuffer(buf: Buffer | string | undefined): string {
+  if (!buf) return "";
+  if (typeof buf === "string") return buf;
+  try {
+    // 优先尝试 UTF-8 解码，fatal: true 会在遇到非法 UTF-8 序列时抛出异常
+    return new TextDecoder("utf-8", { fatal: true }).decode(buf);
+  } catch {
+    try {
+      // 如果 UTF-8 解码失败，则尝试 GBK 解码（常用于 Windows 中文环境）
+      return new TextDecoder("gbk").decode(buf);
+    } catch {
+      // 最后的保底解码
+      return new TextDecoder("utf-8", { fatal: false }).decode(buf);
+    }
+  }
+}
 
 function truncateOutput(output: string): string {
   if (output.length <= MAX_OUTPUT_LENGTH) return output;
@@ -100,12 +118,14 @@ function formatCommandError(error: unknown): string {
   if (isExecError(error)) {
     const parts: string[] = [`exit code: ${error.code}`];
 
-    if (error.stdout?.trim()) {
-      parts.push(`stdout:\n${truncateOutput(error.stdout.trim())}`);
+    const stdoutStr = decodeBuffer(error.stdout);
+    if (stdoutStr.trim()) {
+      parts.push(`stdout:\n${truncateOutput(stdoutStr.trim())}`);
     }
 
-    if (error.stderr?.trim()) {
-      parts.push(`stderr:\n${truncateOutput(error.stderr.trim())}`);
+    const stderrStr = decodeBuffer(error.stderr);
+    if (stderrStr.trim()) {
+      parts.push(`stderr:\n${truncateOutput(stderrStr.trim())}`);
     }
 
     if (error.killed) {
@@ -122,8 +142,8 @@ function isExecError(
   error: unknown,
 ): error is {
   code: number | null;
-  stdout: string;
-  stderr: string;
+  stdout: Buffer | string;
+  stderr: Buffer | string;
   killed: boolean;
   message: string;
 } {

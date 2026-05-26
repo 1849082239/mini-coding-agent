@@ -1,8 +1,8 @@
-import { exec } from "node:child_process";
+import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import type { Tool, AgentState } from "../types";
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 export const searchTool: Tool = {
   name: "search",
@@ -29,8 +29,16 @@ export const searchTool: Tool = {
     const maxResults = Number(args.maxResults) || 20;
 
     try {
-      const { stdout } = await execAsync(
-        `rg --line-number --max-count ${maxResults} -- "${query}" "${state.workingDir}"`,
+      const { stdout } = await execFileAsync(
+        "rg",
+        [
+          "--line-number",
+          "--max-count",
+          String(maxResults),
+          "--",
+          query,
+          state.workingDir,
+        ],
         { maxBuffer: 1024 * 1024 }
       );
 

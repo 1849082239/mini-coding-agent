@@ -64,7 +64,7 @@ function toOpenAIMessage(msg: Message): OpenAI.ChatCompletionMessageParam {
     case "assistant":
       return {
         role: "assistant",
-        content: msg.content,
+        content: msg.content || null,
         ...(msg.toolCalls
           ? {
               tool_calls: msg.toolCalls.map((tc) => ({

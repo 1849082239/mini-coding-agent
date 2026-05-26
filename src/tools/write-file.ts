@@ -39,12 +39,14 @@ export const writeFileTool: Tool = {
     const content = String(args.content ?? "");
 
     /** 安全检查：不允许写入工作目录之外的文件 */
-    if (!filePath.startsWith(state.workingDir)) {
+    const normalizedPath = filePath.replace(/\\/g, "/");
+    const normalizedWorkingDir = state.workingDir.replace(/\\/g, "/");
+    if (!normalizedPath.toLowerCase().startsWith(normalizedWorkingDir.toLowerCase())) {
       return "错误：不能写入工作目录之外的文件。";
     }
 
     /** 不允许覆盖 .git 目录 */
-    if (filePath.includes("/.git/") || filePath.endsWith("/.git")) {
+    if (normalizedPath.includes("/.git/") || normalizedPath.endsWith("/.git")) {
       return "错误：不允许修改 .git 目录下的文件。";
     }
 
