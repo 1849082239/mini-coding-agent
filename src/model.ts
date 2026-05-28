@@ -13,11 +13,12 @@ export class Model {
     this.client = new OpenAI({
       apiKey: options.apiKey,
       baseURL: options.baseURL,
+      timeout: 20000, // 20秒超时，防止网络不通时无限挂起
     });
     this.model = options.model ?? "gpt-4o";
   }
 
-  async chat(messages: Message[], tools?: Tool[]): Promise<ModelResponse> {
+  async generate(messages: Message[], tools?: Tool[]): Promise<ModelResponse> {
     const toolDefinitions = tools?.map((t) => ({
       type: "function" as const,
       function: {
@@ -27,12 +28,14 @@ export class Model {
       },
     }));
 
+    console.log("🤖 正在向大模型发送请求 (model: " + this.model + ")...");
     const response = await this.client.chat.completions.create({
       model: this.model,
       messages: messages.map(toOpenAIMessage),
       tools: toolDefinitions,
       temperature: 0,
     });
+    console.log(`🤖 收到大模型响应 (Tokens: ${response.usage?.total_tokens || 'unknown'})`);
 
     const choice = response.choices[0];
     const content = choice.message.content ?? "";
